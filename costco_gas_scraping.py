@@ -11,6 +11,8 @@ urls = ["https://www.costco.com/warehouse-locations/tustin-ranch-tustin-ca-122.h
         "https://www.costco.com/warehouse-locations/fountain-valley-ca-411.html",
         "https://www.costco.com/warehouse-locations/irvine-ca-454.html"]
 
+f = open("output.txt", "w")
+
 for url in urls:
     r = requests.get(url, timeout = 5, headers = HEADERS)
     soup = BeautifulSoup(r.text, "html.parser")
@@ -19,4 +21,6 @@ for url in urls:
     address = soup.find("span", {"id": "address"}).find("span").text
     regular_gas = prices[0].parent.find_all("span")[1].text[:-1]
     premium_gas = prices[1].parent.find_all("span")[1].text[:-1]
-    print("Name: " + name + ". Address: " + address + ". Regular Gas: " + regular_gas + ". Premium Gas: " + premium_gas + "\n")
+    f.write("Name: " + name + ". Address: " + address + ". Regular Gas: " + regular_gas + ". Premium Gas: " + premium_gas + "\n")
+
+f.close()
