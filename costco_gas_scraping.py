@@ -30,15 +30,18 @@ for link in driver.find_elements(By.TAG_NAME, "a"):
         urls.add(string_link)
 
 #Visit all the URLs
+f = open("output.txt", "w")
 for url in urls:
     driver.get(url)
     wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "warehouse-body")))
+
     #Check to see if the store has a gas station
     if driver.find_elements("xpath", '/html/body/main/div[3]/div[3]/div[3]/div[2]/div/div/div[2]/div[2]/div/div[5]/div[1]/span[2]'):
         warehouse_name = driver.find_element("xpath", '//*[@id="warehouse"]/div[3]/div[2]/h1').text
         warehouse_address = driver.find_element("xpath", '//*[@id="address"]/div[1]/span[1]').text
         regular_gas = driver.find_element("xpath", '/html/body/main/div[3]/div[3]/div[3]/div[2]/div/div/div[2]/div[2]/div/div[5]/div[1]/span[2]').get_attribute('innerHTML').split('<')[0]
         premium_gas = driver.find_element("xpath", '/html/body/main/div[3]/div[3]/div[3]/div[2]/div/div/div[2]/div[2]/div/div[5]/div[2]/span[2]').get_attribute('innerHTML').split('<')[0]
-        print("Name: " + warehouse_name + ". Address: " + warehouse_address + ". Regular Gas: " + regular_gas + ". Premium Gas: " + premium_gas)
+        f.write("Name: " + warehouse_name + ". Address: " + warehouse_address + ". Regular Gas: " + regular_gas + ". Premium Gas: " + premium_gas + "\n")
 time.sleep(5)
+f.close()
 driver.close()
