@@ -33,7 +33,6 @@ for link in driver.find_elements(By.TAG_NAME, "a"):
 for url in urls:
     driver.get(url)
     wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "warehouse-body")))
-    #time.sleep(4)
     #Check to see if the store has a gas station
     if driver.find_elements("xpath", '/html/body/main/div[3]/div[3]/div[3]/div[2]/div/div/div[2]/div[2]/div/div[5]/div[1]/span[2]'):
         warehouse_name = driver.find_element("xpath", '//*[@id="warehouse"]/div[3]/div[2]/h1').text
