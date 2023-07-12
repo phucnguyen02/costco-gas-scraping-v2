@@ -21,10 +21,6 @@ urls = ["https://www.costco.com/warehouse-locations/tustin-ranch-tustin-ca-122.h
         "https://www.costco.com/warehouse-locations/fountain-valley-ca-411.html",
         "https://www.costco.com/warehouse-locations/irvine-ca-454.html"]
 
-
-db.collection('warehouses')
-
-
 def scrape_gas(urls):
     f = open("output.txt", "w")
     for url in urls:
