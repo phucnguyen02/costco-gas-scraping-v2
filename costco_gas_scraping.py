@@ -4,6 +4,7 @@ import requests
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
+import datetime
 
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
@@ -38,6 +39,7 @@ def scrape_gas(urls):
             db.collection('warehouses').document(name).update(data)
         else:
             db.collection('warehouses').document(name).set(data)
+    f.write("Last updated: " + str(datetime.datetime.now()))
     f.close()
 
 
