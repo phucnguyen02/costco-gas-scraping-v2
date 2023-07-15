@@ -1,3 +1,7 @@
+from flask import escape
+
+import functions_framework
+
 from bs4 import BeautifulSoup
 import requests
 
@@ -22,6 +26,28 @@ urls = ["https://www.costco.com/warehouse-locations/tustin-ranch-tustin-ca-122.h
         "https://www.costco.com/warehouse-locations/fountain-valley-ca-411.html",
         "https://www.costco.com/warehouse-locations/irvine-ca-454.html"]
 
+@functions_framework.http
+def hello_http(request):
+    """HTTP Cloud Function.
+    Args:
+        request (flask.Request): The request object.
+        <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
+    Returns:
+        The response text, or any set of values that can be turned into a
+        Response object using `make_response`
+        <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
+    """
+    request_json = request.get_json(silent=True)
+    request_args = request.args
+
+    if request_json and "name" in request_json:
+        name = request_json["name"]
+    elif request_args and "name" in request_args:
+        name = request_args["name"]
+    else:
+        name = "World"
+    return f"Hello {escape(name)}!"
+
 def scrape_gas(urls):
     f = open("output.txt", "w")
     for url in urls:
@@ -39,7 +65,16 @@ def scrape_gas(urls):
             db.collection('warehouses').document(name).update(data)
         else:
             db.collection('warehouses').document(name).set(data)
-    f.write("Last updated: " + str(datetime.datetime.now()))
+    
+    cur_time = str(datetime.datetime.now())
+    time = {"Updated_Time": cur_time}
+    available = db.collection('warehouses').document("time").get()
+    if available.exists:
+        db.collection('warehouses').document("time").update(time)
+    else:
+        db.collection('warehouses').document("time").set(time)
+
+    f.write("\nLast updated: " + str(datetime.datetime.now()))
     f.close()
 
 
