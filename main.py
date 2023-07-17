@@ -58,8 +58,9 @@ def scrape_gas(urls):
         address = soup.find("span", {"id": "address"}).find("span").text
         regular_gas = prices[0].parent.find_all("span")[1].text[:-1]
         premium_gas = prices[1].parent.find_all("span")[1].text[:-1]
+        cur_time = str(datetime.datetime.now())
         f.write("Name: " + name + ". Address: " + address + ". Regular Gas: " + regular_gas + ". Premium Gas: " + premium_gas + "\n")
-        data = {'Name': name, 'Address': address, 'Regular_Gas': regular_gas, 'Premium_Gas': premium_gas}
+        data = {'Name': name, 'Address': address, 'Regular_Gas': regular_gas, 'Premium_Gas': premium_gas, 'Updated_Time': cur_time}
         available = db.collection('warehouses').document(name).get()
         if available.exists:
             db.collection('warehouses').document(name).update(data)
@@ -67,13 +68,6 @@ def scrape_gas(urls):
             db.collection('warehouses').document(name).set(data)
     
     cur_time = str(datetime.datetime.now())
-    time = {"Updated_Time": cur_time}
-    available = db.collection('warehouses').document("time").get()
-    if available.exists:
-        db.collection('warehouses').document("time").update(time)
-    else:
-        db.collection('warehouses').document("time").set(time)
-
     f.write("\nLast updated: " + str(datetime.datetime.now()))
     f.close()
 
