@@ -49,6 +49,7 @@ def hello_http(request):
     return f"Hello {escape(name)}!"
 
 def scrape_gas(urls):
+    f = open("output.txt", "w")
     for url in urls:
         r = requests.get(url, timeout = 5, headers = HEADERS)
         soup = BeautifulSoup(r.text, "html.parser")
@@ -66,5 +67,8 @@ def scrape_gas(urls):
             db.collection('warehouses').document(name).update(data)
         else:
             db.collection('warehouses').document(name).set(data)
-
+        f.write("Name: " + name + ". Address: " + address + ". Regular Gas: " + regular_gas + ". Premium Gas: " + premium_gas + "\n")
+    cur_time = str(datetime.datetime.now())
+    f.write("\nLast updated: " + str(datetime.datetime.now()))
+    f.close()
 scrape_gas(urls)
