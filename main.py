@@ -49,27 +49,22 @@ def hello_http(request):
     return f"Hello {escape(name)}!"
 
 def scrape_gas(urls):
-    f = open("output.txt", "w")
     for url in urls:
         r = requests.get(url, timeout = 5, headers = HEADERS)
         soup = BeautifulSoup(r.text, "html.parser")
         prices = soup.find_all("span", {"class": "gas-type"})
         name = soup.find("div", {"class": "warehouse-name"}).find("h1").text
         address = soup.find("span", {"id": "address"}).find("span").text
+        city = soup.find("span", {"id": "address"}).find_all("span")[1].text
+        state = soup.find("span", {"id": "address"}).find_all("span")[2].text
         regular_gas = prices[0].parent.find_all("span")[1].text[:-1]
         premium_gas = prices[1].parent.find_all("span")[1].text[:-1]
         cur_time = str(datetime.datetime.now())
-        f.write("Name: " + name + ". Address: " + address + ". Regular Gas: " + regular_gas + ". Premium Gas: " + premium_gas + "\n")
-        data = {'Name': name, 'Address': address, 'Regular_Gas': regular_gas, 'Premium_Gas': premium_gas, 'Updated_Time': cur_time}
+        data = {'Name': name, 'Address': address, 'City': city, 'State': state, 'Regular_Gas': regular_gas, 'Premium_Gas': premium_gas, 'Updated_Time': cur_time}
         available = db.collection('warehouses').document(name).get()
         if available.exists:
             db.collection('warehouses').document(name).update(data)
         else:
             db.collection('warehouses').document(name).set(data)
-    
-    cur_time = str(datetime.datetime.now())
-    f.write("\nLast updated: " + str(datetime.datetime.now()))
-    f.close()
-
 
 scrape_gas(urls)
