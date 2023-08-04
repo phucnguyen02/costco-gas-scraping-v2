@@ -9,6 +9,7 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 import datetime
+import pytz
 
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
@@ -60,15 +61,19 @@ def scrape_gas(urls):
         state = soup.find("span", {"id": "address"}).find_all("span")[2].text
         regular_gas = prices[0].parent.find_all("span")[1].text[:-1]
         premium_gas = prices[1].parent.find_all("span")[1].text[:-1]
-        cur_time = str(datetime.datetime.now())
-        data = {'Name': name, 'Address': address, 'City': city, 'State': state, 'Regular_Gas': regular_gas, 'Premium_Gas': premium_gas, 'Updated_Time': cur_time}
-        available = db.collection('warehouses').document(name).get()
-        if available.exists:
+        data = {'Name': name, 'Address': address, 'City': city, 'State': state, 'Regular_Gas': regular_gas, 'Premium_Gas': premium_gas}
+        cur_entry = db.collection('warehouses').document(name).get()
+        cur_time = str(datetime.datetime.now(pytz.timezone("US/Pacific")))
+        if cur_entry.exists:
+            cur_regular = cur_entry.to_dict()['Regular_Gas']
+            cur_premium = cur_entry.to_dict()['Premium_Gas']
+            if cur_regular != regular_gas or cur_premium != premium_gas:   
+                data['Updated_Time'] = cur_time
             db.collection('warehouses').document(name).update(data)
         else:
+            data['Updated_Time'] = cur_time
             db.collection('warehouses').document(name).set(data)
         f.write("Name: " + name + ". Address: " + address + ". Regular Gas: " + regular_gas + ". Premium Gas: " + premium_gas + "\n")
-    cur_time = str(datetime.datetime.now())
-    f.write("\nLast updated: " + str(datetime.datetime.now()))
+    f.write("\nLast updated: " + cur_time)
     f.close()
 scrape_gas(urls)
