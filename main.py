@@ -4,38 +4,19 @@ import functions_framework
 
 from bs4 import BeautifulSoup
 import requests
+import datetime
+import warehouse_urls
+import pytz
 
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
-import datetime
-import pytz
 
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()
 HEADERS = { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:82.0) Gecko/20100101 Firefox/82.0' }
-
-urls = ["https://www.costco.com/warehouse-locations/tustin-ranch-tustin-ca-122.html",
-        "https://www.costco.com/warehouse-locations/garden-grove-ca-126.html",
-        "https://www.costco.com/warehouse-locations/tustin-ca-1001.html",
-        "https://www.costco.com/warehouse-locations/fullerton-ca-418.html",
-        "https://www.costco.com/warehouse-locations/laguna-niguel-ca-28.html",
-        "https://www.costco.com/warehouse-locations/laguna-marketplace-laguna-niguel-ca-690.html",
-        "https://www.costco.com/warehouse-locations/huntington-beach-ca-1110.html",
-        "https://www.costco.com/warehouse-locations/fountain-valley-ca-411.html",
-        "https://www.costco.com/warehouse-locations/irvine-ca-454.html",
-        'https://www.costco.com/warehouse-locations/monterey-park-ca-1318.html',
-        'https://www.costco.com/warehouse-locations/burbank-ca-677.html',
-        'https://www.costco.com/warehouse-locations/culver-city-marina-del-rey-ca-479.html',
-        'https://www.costco.com/warehouse-locations/burbank-business-center-north-hollywood-ca-653.html',
-        'https://www.costco.com/warehouse-locations/commerce-business-center-commerce-ca-569.html',
-        'https://www.costco.com/warehouse-locations/norwalk-ca-norwalk-ca-410.html',
-        'https://www.costco.com/warehouse-locations/los-feliz-los-angeles-ca-130.html'
-        'https://www.costco.com/warehouse-locations/inglewood-ca-769.html',
-        'https://www.costco.com/warehouse-locations/hawthorne-business-center-hawthorne-ca-564.html',
-        'https://www.costco.com/warehouse-locations/alhambra-ca-428.html']
 
 @functions_framework.http
 def hello_http(request):
@@ -83,4 +64,6 @@ def scrape_gas(urls):
             else:
                 data['Updated_Time'] = cur_time
                 db.collection('warehouses').document(name).set(data)
-scrape_gas(urls)
+
+                
+scrape_gas(warehouse_urls.urls)
