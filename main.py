@@ -25,7 +25,17 @@ urls = ["https://www.costco.com/warehouse-locations/tustin-ranch-tustin-ca-122.h
         "https://www.costco.com/warehouse-locations/laguna-marketplace-laguna-niguel-ca-690.html",
         "https://www.costco.com/warehouse-locations/huntington-beach-ca-1110.html",
         "https://www.costco.com/warehouse-locations/fountain-valley-ca-411.html",
-        "https://www.costco.com/warehouse-locations/irvine-ca-454.html"]
+        "https://www.costco.com/warehouse-locations/irvine-ca-454.html",
+        'https://www.costco.com/warehouse-locations/monterey-park-ca-1318.html',
+        'https://www.costco.com/warehouse-locations/burbank-ca-677.html',
+        'https://www.costco.com/warehouse-locations/culver-city-marina-del-rey-ca-479.html',
+        'https://www.costco.com/warehouse-locations/burbank-business-center-north-hollywood-ca-653.html',
+        'https://www.costco.com/warehouse-locations/commerce-business-center-commerce-ca-569.html',
+        'https://www.costco.com/warehouse-locations/norwalk-ca-norwalk-ca-410.html',
+        'https://www.costco.com/warehouse-locations/los-feliz-los-angeles-ca-130.html'
+        'https://www.costco.com/warehouse-locations/inglewood-ca-769.html',
+        'https://www.costco.com/warehouse-locations/hawthorne-business-center-hawthorne-ca-564.html',
+        'https://www.costco.com/warehouse-locations/alhambra-ca-428.html']
 
 @functions_framework.http
 def hello_http(request):
@@ -50,30 +60,27 @@ def hello_http(request):
     return f"Hello {escape(name)}!"
 
 def scrape_gas(urls):
-    f = open("output.txt", "w")
     for url in urls:
         r = requests.get(url, timeout = 5, headers = HEADERS)
         soup = BeautifulSoup(r.text, "html.parser")
         prices = soup.find_all("span", {"class": "gas-type"})
-        name = soup.find("div", {"class": "warehouse-name"}).find("h1").text
-        address = soup.find("span", {"id": "address"}).find("span").text
-        city = soup.find("span", {"id": "address"}).find_all("span")[1].text
-        state = soup.find("span", {"id": "address"}).find_all("span")[2].text
-        regular_gas = prices[0].parent.find_all("span")[1].text[:-1]
-        premium_gas = prices[1].parent.find_all("span")[1].text[:-1]
-        data = {'Name': name, 'Address': address, 'City': city, 'State': state, 'Regular_Gas': regular_gas, 'Premium_Gas': premium_gas}
-        cur_entry = db.collection('warehouses').document(name).get()
-        cur_time = str(datetime.datetime.now(pytz.timezone("US/Pacific")))
-        if cur_entry.exists:
-            cur_regular = cur_entry.to_dict()['Regular_Gas']
-            cur_premium = cur_entry.to_dict()['Premium_Gas']
-            if cur_regular != regular_gas or cur_premium != premium_gas:   
+        if prices:
+            name = soup.find("div", {"class": "warehouse-name"}).find("h1").text
+            address = soup.find("span", {"id": "address"}).find("span").text
+            city = soup.find("span", {"id": "address"}).find_all("span")[1].text
+            state = soup.find("span", {"id": "address"}).find_all("span")[2].text
+            regular_gas = prices[0].parent.find_all("span")[1].text[:-1]
+            premium_gas = prices[1].parent.find_all("span")[1].text[:-1]
+            data = {'Name': name, 'Address': address, 'City': city, 'State': state, 'Regular_Gas': regular_gas, 'Premium_Gas': premium_gas}
+            cur_entry = db.collection('warehouses').document(name).get()
+            cur_time = str(datetime.datetime.now(pytz.timezone("US/Pacific")))
+            if cur_entry.exists:
+                cur_regular = cur_entry.to_dict()['Regular_Gas']
+                cur_premium = cur_entry.to_dict()['Premium_Gas']
+                if cur_regular != regular_gas or cur_premium != premium_gas:   
+                    data['Updated_Time'] = cur_time
+                db.collection('warehouses').document(name).update(data)
+            else:
                 data['Updated_Time'] = cur_time
-            db.collection('warehouses').document(name).update(data)
-        else:
-            data['Updated_Time'] = cur_time
-            db.collection('warehouses').document(name).set(data)
-        f.write("Name: " + name + ". Address: " + address + ". Regular Gas: " + regular_gas + ". Premium Gas: " + premium_gas + "\n")
-    f.write("\nLast updated: " + cur_time)
-    f.close()
+                db.collection('warehouses').document(name).set(data)
 scrape_gas(urls)

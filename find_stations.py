@@ -6,8 +6,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 driver = webdriver.Chrome("chromedriver")
-wait = WebDriverWait(driver, 10)
-location = "Irvine, CA"
+wait = WebDriverWait(driver, 3)
+location = "LA"
 
 driver.get("https://www.costco.com/warehouse-locations?langId=-1&storeId=10301&catalogId=10701")
 time.sleep(3)
