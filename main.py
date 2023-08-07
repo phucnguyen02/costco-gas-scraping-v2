@@ -45,15 +45,20 @@ def scrape_gas(urls):
         r = requests.get(url, timeout = 5, headers = HEADERS)
         soup = BeautifulSoup(r.text, "html.parser")
         prices = soup.find_all("span", {"class": "gas-type"})
+        name = soup.find("div", {"class": "warehouse-name"}).find("h1").text
+        cur_entry = db.collection('warehouses').document(name).get()
         if prices:
-            name = soup.find("div", {"class": "warehouse-name"}).find("h1").text
             address = soup.find("span", {"id": "address"}).find("span").text
             city = soup.find("span", {"id": "address"}).find_all("span")[1].text
             state = soup.find("span", {"id": "address"}).find_all("span")[2].text
-            regular_gas = prices[0].parent.find_all("span")[1].text[:-1]
-            premium_gas = prices[1].parent.find_all("span")[1].text[:-1]
+            regular_gas = "?"
+            if prices[0].parent.find_all("span")[1].text[:-1]:
+                regular_gas = prices[0].parent.find_all("span")[1].text[:-1]
+
+            premium_gas = "?"
+            if prices[1].parent.find_all("span")[1].text[:-1]:
+                premium_gas = prices[1].parent.find_all("span")[1].text[:-1]
             data = {'Name': name, 'Address': address, 'City': city, 'State': state, 'Regular_Gas': regular_gas, 'Premium_Gas': premium_gas}
-            cur_entry = db.collection('warehouses').document(name).get()
             cur_time = str(datetime.datetime.now(pytz.timezone("US/Pacific")))
             if cur_entry.exists:
                 cur_regular = cur_entry.to_dict()['Regular_Gas']
@@ -64,6 +69,11 @@ def scrape_gas(urls):
             else:
                 data['Updated_Time'] = cur_time
                 db.collection('warehouses').document(name).set(data)
+                
+        else:
+            if cur_entry.exists:
+                db.collection('warehouses').document(name).delete()
+                
 
                 
 scrape_gas(warehouse_urls.urls)
