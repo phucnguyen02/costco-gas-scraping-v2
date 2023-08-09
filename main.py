@@ -52,25 +52,31 @@ def scrape_gas(urls):
         soup = BeautifulSoup(r.text, "html.parser")
 
         #Retrieves the gas prices and name of the gas station, along with its entry in the Firestore database
-        prices = soup.find_all("span", {"class": "gas-type"})
+        gas_types = soup.find_all("span", {"class": "gas-type"})
         name = soup.find("div", {"class": "warehouse-name"}).find("h1").text
         cur_entry = db.collection('warehouses').document(name).get()
 
         #If this station does sell gas, then it continues scraping the types of gas
-        if prices:
+        if gas_types:
             address = soup.find("span", {"id": "address"}).find("span").text
             city = soup.find("span", {"id": "address"}).find_all("span")[1].text
             state = soup.find("span", {"id": "address"}).find_all("span")[2].text
 
-            #If this station is not selling regular gas then the price would be unknown
             regular_gas = "?"
-            if prices[0].parent.find_all("span")[1].text[:-1]:
-                regular_gas = prices[0].parent.find_all("span")[1].text[:-1]
-
-            #If this station is not selling premium gas then the price would be unknown
             premium_gas = "?"
-            if prices[1].parent.find_all("span")[1].text[:-1]:
-                premium_gas = prices[1].parent.find_all("span")[1].text[:-1]
+
+            #If the station is only selling 1 gas type, the type is checked so the corresponding price is updated
+            if len(gas_types) == 1:
+                price = gas_types[0].parent.find_all("span")[1].text[:-1]
+                if gas_types[0].parent.find_all("span")[1].text == "Regular":
+                    regular_gas = price
+                else:
+                    premium_gas = price
+                    
+            #Otherwise, both prices are updated
+            else:
+                regular_gas = gas_types[0].parent.find_all("span")[1].text[:-1]
+                premium_gas = gas_types[1].parent.find_all("span")[1].text[:-1]
 
             #Creates a new entry for the Firestore database
             data = {'Name': name, 'Address': address, 'City': city, 'State': state, 'Regular_Gas': regular_gas, 'Premium_Gas': premium_gas}
