@@ -46,8 +46,11 @@ def hello_http(request):
     return f"Hello {escape(name)}!"
 
 class ScrapeGas:
-    def scrape_gas(self, urls):
-        for url in urls:
+    def __init__(self, urls):
+        self.urls = urls
+
+    def scrape_gas(self):
+        for url in self.urls:
             #A request is made to each gas station page, and times out within 5 seconds
             r = requests.get(url, timeout = 5, headers = HEADERS)
             soup = BeautifulSoup(r.text, "html.parser")
@@ -100,5 +103,5 @@ class ScrapeGas:
                     db.collection('warehouses').document(name).delete()
                     
 #The array of gas station URLs is retrieved and passed into the function
-scrape = ScrapeGas()
-scrape.scrape_gas(warehouse_urls.urls)
+scrape = ScrapeGas(warehouse_urls.urls)
+scrape.scrape_gas()
