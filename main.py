@@ -45,12 +45,11 @@ def hello_http(request):
         name = "World"
     return f"Hello {escape(name)}!"
 
-def scrape_gas(urls):
-    for url in urls:
+def scrape_gas():
+    for url in warehouse_urls.urls:
         #A request is made to each gas station page, and times out within 5 seconds
         r = requests.get(url, timeout = 5, headers = HEADERS)
         soup = BeautifulSoup(r.text, "html.parser")
-
         #Retrieves the gas prices and name of the gas station, along with its entry in the Firestore database
         gas_types = soup.find_all("span", {"class": "gas-type"})
         name = soup.find("div", {"class": "warehouse-name"}).find("h1").text
@@ -104,5 +103,4 @@ def scrape_gas(urls):
             if cur_entry.exists:
                 db.collection('warehouses').document(name).delete()
                 
-#The array of gas station URLs is retrieved and passed into the function
-scrape_gas(warehouse_urls.urls)
+scrape_gas()
