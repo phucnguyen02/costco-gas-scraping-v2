@@ -20,9 +20,10 @@ input_box.send_keys(location)
 input_box.send_keys(Keys.ENTER)
 time.sleep(3)
 
-#Retrieve the URLs to all the stores within Irvine, CA
+#Retrieve the URLs to all the stores within the provided location
 urls = set()
 for link in driver.find_elements(By.TAG_NAME, "a"):
+    #If the href element contains a link that starts with warehouse-locations then it is added to the list of valid URLs
     string_link = link.get_attribute("href")
     if string_link and string_link.startswith("https://www.costco.com/warehouse-locations/"):
         urls.add(string_link)
