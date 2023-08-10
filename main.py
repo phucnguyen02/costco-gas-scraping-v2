@@ -66,7 +66,7 @@ def scrape_gas():
             #If the station is only selling 1 gas type, the type is checked so the corresponding price is updated
             if len(gas_types) == 1:
                 price = gas_types[0].parent.find_all("span")[1].text[:-1]
-                if gas_types[0].text == "Regular":
+                if "Regular" in gas_types[0].text:
                     regular_gas = price
                 else:
                     premium_gas = price

@@ -1,0 +1,23 @@
+<div>
+    <span class = "gas-type">
+        Regular
+    </span>
+    <span>$4.999</span>
+</div>
+
+
+<div>
+    <span class = "gas-type">
+        Premium
+    </span>
+    <span>$5.299</span>
+</div>
+
+<div class = "warehouse-name">
+    <h1>Haha</h1>
+    <span id = 'address'>
+        <span>123 Avalon St</span>
+        <span>Tustin</span>
+        <span>CA</span>
+    </span>
+</div>

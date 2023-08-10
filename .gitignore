@@ -4,6 +4,3 @@ serviceAccountKey.json
 Archive.zip
 Procfile
 warehouse_urls.py
-scrape_gas_single.py
-tests.py
-test_data.txt
