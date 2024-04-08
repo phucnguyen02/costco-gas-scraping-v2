@@ -49,6 +49,7 @@ def hello_http(request):
 
 def scrape_gas():
     try:
+        #test
         for url in warehouse_urls.urls:
             #A request is made to each gas station page, and times out within 5 seconds
             r = requests.get(url, timeout = 5, headers = HEADERS)
