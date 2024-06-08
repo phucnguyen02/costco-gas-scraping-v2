@@ -85,8 +85,7 @@ def scrape_gas():
                 cur_time = str(datetime.datetime.now(pytz.timezone("US/Pacific")))
 
                 #Creates a new entry for the Firestore database
-                data = {'Name': name, 'Address': address, 'City': city, 'State': state, 'Regular_Gas': regular_gas, 'Premium_Gas': premium_gas, 'Scraped_Time': cur_time}
-                
+                data = {'Name': name, 'Address': address, 'City': city, 'State': state, 'Regular_Gas': regular_gas, 'Premium_Gas': premium_gas, 'Scraped_Time': cur_time, 'Regular_Trend': [], 'Premium_Trend': []}
 
                 #If the entry for the station already exists within the Firestore database,
                 #it checks if each type of gas has a different price from a previous scrape.
@@ -96,8 +95,21 @@ def scrape_gas():
                 if cur_entry.exists:
                     cur_regular = cur_entry.to_dict()['Regular_Gas']
                     cur_premium = cur_entry.to_dict()['Premium_Gas']
+                    
                     if cur_regular != regular_gas or cur_premium != premium_gas:   
                         data['Updated_Time'] = cur_time
+
+                    cur_regular_trend = cur_entry.to_dict()['Regular_Trend']
+                    cur_premium_trend = cur_entry.to_dict()['Premium_Trend']
+
+                    cur_regular_trend.append(regular_gas)
+                    if len(cur_regular_trend) > 7: cur_regular_trend.pop(0)
+                    data['Regular_Trend'] = cur_regular_trend
+
+                    cur_premium_trend.append(regular_gas)
+                    if len(cur_premium_trend) > 7: cur_premium_trend.pop(0)
+                    data['Premium_Trend'] = cur_premium_trend
+
                     db.collection('warehouses').document(name).update(data)
                 else:
                     data['Updated_Time'] = cur_time
