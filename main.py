@@ -106,7 +106,7 @@ def scrape_gas():
                     if len(cur_regular_trend) > 7: cur_regular_trend.pop(0)
                     data['Regular_Trend'] = cur_regular_trend
 
-                    cur_premium_trend.append(regular_gas)
+                    cur_premium_trend.append(premium_gas)
                     if len(cur_premium_trend) > 7: cur_premium_trend.pop(0)
                     data['Premium_Trend'] = cur_premium_trend
 
