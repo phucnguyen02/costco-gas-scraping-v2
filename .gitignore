@@ -4,3 +4,4 @@ serviceAccountKey.json
 Procfile
 warehouse_urls.py
 gas_scrape.zip
+vehicles.csv
