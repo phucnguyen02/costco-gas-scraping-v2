@@ -11,13 +11,13 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 def update_db(fuel_type, car_list):
-    cur_entry = db.collection('car_brands').document(fuel_type).get()
+    cur_entry = db.collection('car_brands').document('Car Brands By Gas Type').get()
 
     #Updates the database
     if not cur_entry.exists:
-        db.collection('car_brands').document(fuel_type).set({fuel_type: car_list})
+        db.collection('car_brands').document('Car Brands By Gas Type').set({fuel_type: car_list})
     else:
-        db.collection('car_brands').document(fuel_type).update({fuel_type: car_list})
+        db.collection('car_brands').document('Car Brands By Gas Type').update({fuel_type: car_list})
 
 def check_csv():
     # Retrieve only the car make, model and fuel type
